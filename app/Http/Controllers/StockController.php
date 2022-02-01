@@ -25,13 +25,11 @@ class StockController extends Controller
             $stock->updated_at = Carbon::now();
             $stock->save();
             $stock_name = $stock->name;
-
         } else {
             $stock_name = $request->stocks;
         }
 
        $text = $this->analisys($stock_name);
-
         if($text) {
             $telegram->sendMessage([
                 'chat_id' => '@ageofinvestments',
@@ -40,6 +38,11 @@ class StockController extends Controller
             ]);
         }
 
+        return response([
+            'error' => false,
+            'message' => 'Success',
+            'data' => $stock_name,
+        ], 200);
     }
 
     /**
