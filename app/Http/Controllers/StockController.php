@@ -32,7 +32,6 @@ class StockController extends Controller
 
        $text = $this->analisys($stock_name);
 
-        dd($text);
         if($text) {
             $telegram->sendMessage([
                 'chat_id' => '@ageofinvestments',
