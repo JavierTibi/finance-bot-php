@@ -15,34 +15,43 @@ class StockController extends Controller
 {
     public function getStock(Request $request)
     {
+        try {
+            $telegram = TelegramService::new();
 
-        $telegram = TelegramService::new();
+            $stock = Stock::orderBy('updated_at', 'ASC')->first();
 
-        $stock = Stock::orderBy('updated_at', 'ASC')->first();
+            if(!isset($request->stocks))
+            {
+                $stock->updated_at = Carbon::now();
+                $stock->save();
+                $stock_name = $stock->name;
+            } else {
+                $stock_name = $request->stocks;
+            }
 
-        if(!isset($request->stocks))
-        {
-            $stock->updated_at = Carbon::now();
-            $stock->save();
-            $stock_name = $stock->name;
-        } else {
-            $stock_name = $request->stocks;
+            $text = $this->analisys($stock_name);
+            if($text) {
+                $telegram->sendMessage([
+                    'chat_id' => '@ageofinvestments',
+                    'text' => $text,
+                    'parse_mode' => 'HTML'
+                ]);
+            }
+
+            return response([
+                'error' => false,
+                'message' => 'Success',
+                'data' => $stock_name,
+            ], 200);
+
+        } catch (\Exception $exception) {
+            return response([
+                'error' => true,
+                'message' => 'Error',
+                'data' => $exception->getMessage(),
+            ], 400);
         }
 
-       $text = $this->analisys($stock_name);
-        if($text) {
-            $telegram->sendMessage([
-                'chat_id' => '@ageofinvestments',
-                'text' => $text,
-                'parse_mode' => 'HTML'
-            ]);
-        }
-
-        return response([
-            'error' => false,
-            'message' => 'Success',
-            'data' => $stock_name,
-        ], 200);
     }
 
     /**
