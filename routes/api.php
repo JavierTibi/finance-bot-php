@@ -15,12 +15,9 @@ use App\Http\Controllers\WebhookController;
 |
 */
 
-Route::middleware([])->group(function () {
-    //Stock
-    Route::get('stock', [StockController::class, 'getStock']);
-    Route::get('historic', [StockController::class, 'historicalAnalysis']);
-    Route::post('webhook', [WebhookController::class, 'webhook']);
+//Stock
+Route::get('stock', [StockController::class, 'getStock']);
+Route::get('historic', [StockController::class, 'historicalAnalysis']);
+Route::post('webhook', [WebhookController::class, 'webhook']);
 
-    Route::get('setWebhook', [WebhookController::class, 'setWebhook']);
-
-});
+Route::get('setWebhook', [WebhookController::class, 'setWebhook']);
