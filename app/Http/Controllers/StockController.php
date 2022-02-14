@@ -41,7 +41,7 @@ class StockController extends Controller
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
-                    'parse_mode' => 'HTML'
+                    'parse_mode' => 'MARKDOWN'
                 ]);
             }
 
@@ -110,7 +110,7 @@ class StockController extends Controller
             $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
 
             if($condition_buy_2 && ($condition_buy_3 || $condition_buy_4) && $condition_buy_5 && $condition_buy_6) {
-                $text = 'COMPRA: <b>' . $stock .'</b> - Precio: ' . $price . ' '. hex2bin('F09F9388') ;
+                $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
                 Stock::updateOrCreate(
                     [
@@ -130,7 +130,7 @@ class StockController extends Controller
 
 
             if($condition_sell_2 && ($condition_sell_3 || $condition_sell_4) && $condition_sell_5) {
-                $text = 'VENTA <b>' . $stock .'</b> - Precio: ' . $price .' ' . hex2bin('F09F98B0') ;
+                $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
                 Stock::updateOrCreate(
                     [
                         'name' => $stock,

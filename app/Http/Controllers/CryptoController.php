@@ -63,11 +63,13 @@ class CryptoController extends Controller
             $text = null;
             $to = Carbon::now()->timestamp;
             $from = Carbon::now()->subYear()->timestamp;
+            $crypto = explode(':', $crypto_name);
+            $crypto_txt = explode('USDT', $crypto[1]);
 
             $rsi = FinnhubService::rsi($crypto_name, $from, $to, 14);
             $candles = FinnhubService::cryptoCandle($crypto_name, $from, $to);
 
-            $i = count($rsi);
+            $i = count($rsi) - 1;
             $price = $candles['c'][$i];
 
             //COMPRA
@@ -75,9 +77,9 @@ class CryptoController extends Controller
             $condition_buy_2 = ($rsi[$i] > $rsi[$i-1]);
 
             if($condition_buy_1 && $condition_buy_2) {
-                $text = 'COMPRA: <b>' . $crypto_name .'</b> - Precio: ' . $price . ' '. hex2bin('F09F9388') ;
+                $text = 'COMPRA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
-                Stock::updateOrCreate(
+                Cryptos::updateOrCreate(
                     [
                         'name' => $crypto_name,
                     ],
@@ -93,9 +95,9 @@ class CryptoController extends Controller
             $condition_sell_2 = ($rsi[$i] < $rsi[$i-1]);
 
             if($condition_sell_1 && $condition_sell_2) {
-                $text = 'COMPRA: <b>' . $crypto_name .'</b> - Precio: ' . $price . ' '. hex2bin('F09F9388') ;
+                $text = 'COMPRA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
-                Stock::updateOrCreate(
+                Cryptos::updateOrCreate(
                     [
                         'name' => $crypto_name,
                     ],

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\CryptoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,4 +23,4 @@ Route::post('webhook', [WebhookController::class, 'webhook']);
 
 Route::get('setWebhook', [WebhookController::class, 'setWebhook']);
 
-Route::get('discord', [StockController::class, 'jokeDiscord']);
+Route::get('crypto', [CryptoController::class, 'getCrypto']);
