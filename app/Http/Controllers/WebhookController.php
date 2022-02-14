@@ -40,7 +40,7 @@ class WebhookController extends Controller
 
             $response = $telegram->getWebhookUpdate();
 
-            $crypto_array = ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'FTT', 'CAKE', 'DOGE', 'SHIB', 'AVAX', 'DOT', 'ALGO', 'LTC', 'ATOM', 'UNI', 'LINK', 'LUNA', 'BNB', 'XRP', 'TRX', 'NEAR', 'BCH', 'XLM', 'FTM', 'MANA']
+            $crypto_array = ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'FTT', 'CAKE', 'DOGE', 'SHIB', 'AVAX', 'DOT', 'ALGO', 'LTC', 'ATOM', 'UNI', 'LINK', 'LUNA', 'BNB', 'XRP', 'TRX', 'NEAR', 'BCH', 'XLM', 'FTM', 'MANA'];
 
             if(in_array(strtoupper($response['message']['text']), $crypto_array)){
                 $crypto_txt = 'BINANCE:'.$response['message']['text'].'USDT';
