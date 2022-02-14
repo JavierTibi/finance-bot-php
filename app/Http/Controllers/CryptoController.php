@@ -95,7 +95,7 @@ class CryptoController extends Controller
             $condition_sell_2 = ($rsi[$i] < $rsi[$i-1]);
 
             if($condition_sell_1 && $condition_sell_2) {
-                $text = 'COMPRA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
+                $text = 'VENTA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F98B0') ;
 
                 Cryptos::updateOrCreate(
                     [
