@@ -21,3 +21,5 @@ Route::get('historic', [StockController::class, 'historicalAnalysis']);
 Route::post('webhook', [WebhookController::class, 'webhook']);
 
 Route::get('setWebhook', [WebhookController::class, 'setWebhook']);
+
+Route::get('discord', [StockController::class, 'jokeDiscord']);

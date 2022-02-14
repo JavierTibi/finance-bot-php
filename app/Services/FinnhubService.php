@@ -77,4 +77,17 @@ class FinnhubService
         $client = (new FinnhubService)->init();
         return $client->recommendationTrends($stock);
     }
+
+    /**
+     * @param $crypto
+     * @param $from
+     * @param $to
+     * @return Finnhub\Model\CryptoCandles
+     * @throws Finnhub\ApiException
+     */
+    static public function cryptoCandle($crypto, $from, $to){
+        $client = (new FinnhubService)->init();
+        return $client->cryptoCandles($crypto, "D", $from, $to);
+
+    }
 }
