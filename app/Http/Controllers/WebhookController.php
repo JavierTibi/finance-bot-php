@@ -42,7 +42,7 @@ class WebhookController extends Controller
 
             if(in_array(strtoupper($response['message']['text']), ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'FTT', 'CAKE', 'DOGE', 'SHIB', 'AVAX', 'DOT', 'ALGO'])){
                 $crypto_txt = 'BINANCE:'.$response['message']['text'].'USDT';
-                $text = $this->cryptoController->cryptoAnalysis($crypto_txt);
+                $text = $this->cryptoController->cryptoAnalysis(strtoupper($crypto_txt));
 
                 $crypto = Cryptos::where('name', $crypto_txt)->first();
                 $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($crypto->last_signal) .' . El día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') . ' - Valor: ' . $crypto->price;
