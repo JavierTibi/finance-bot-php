@@ -33,7 +33,7 @@ class CryptoController extends Controller
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
-                    'parse_mode' => 'HTML'
+                    'parse_mode' => 'MARKDOWN'
                 ]);
 
                 $priceAlert = new PriceAlert();

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cryptos;
+use App\Models\Stock;
 use App\Services\TelegramService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class WebhookController extends Controller
@@ -14,11 +17,17 @@ class WebhookController extends Controller
     private $stockController;
 
     /**
+     * @var CryptoController
+     */
+    private $cryptoController;
+
+    /**
      * @param StockController $stockController
      */
-    public function __construct(StockController $stockController)
+    public function __construct(StockController $stockController, CryptoController $cryptoController)
     {
         $this->stockController = $stockController;
+        $this->cryptoController = $cryptoController;
     }
 
     /**
@@ -26,19 +35,41 @@ class WebhookController extends Controller
      * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
     public function webhook(){
-        $telegram = TelegramService::new();
+        try {
+            $telegram = TelegramService::new();
 
-        $response = $telegram->getWebhookUpdate();
+            $response = $telegram->getWebhookUpdate();
 
-        $text = $this->stockController->analisys($response['message']['text']);
-        if(!$text) {
-            $text = '<b><i>Sin movimientos importantes</i></b>';
+            if(in_array($response['message']['text'], ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'FTT', 'CAKE', 'DOGE', 'SHIB', 'AVAX', 'DOT', 'ALGO'])){
+                $crypto_txt = 'BINANCE:'.$response['message']['text'].'USDT';
+                $text = $this->cryptoController->cryptoAnalysis($crypto_txt);
+
+                $crypto = Cryptos::where('name', $crypto_txt)->first();
+                $text_2 = PHP_EOL . 'Última señal ' . $crypto->last_signal .' el día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') . ' - Valor: ' . $crypto->price;
+            } else {
+                $text = $this->stockController->analisys($response['message']['text']);
+                $stock = Stock::where('name', $response['message']['text'])->first();
+
+                $text_2 = PHP_EOL . 'Última señal ' . $stock->last_signal .' el día  ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d');
+            }
+
+            if(!$text) {
+                $text = '*Sin movimientos importantes*';
+            }
+            $text .= $text_2;
+            $telegram->sendMessage([
+                'chat_id' => $response['message']['chat']['id'],
+                'text' => $text,
+                'parse_mode' => 'MARKDOWN'
+            ]);
+        } catch (\Exception $exception) {
+            $telegram->sendMessage([
+                'chat_id' => $response['message']['chat']['id'],
+                'text' => 'Lo siento! No puedo analizar eso.',
+                'parse_mode' => 'MARKDOWN'
+            ]);
         }
-        $telegram->sendMessage([
-            'chat_id' => $response['message']['chat']['id'],
-            'text' => $text,
-            'parse_mode' => 'HTML'
-        ]);
+
 
     }
 }
