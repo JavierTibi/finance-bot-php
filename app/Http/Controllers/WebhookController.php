@@ -45,12 +45,12 @@ class WebhookController extends Controller
                 $text = $this->cryptoController->cryptoAnalysis($crypto_txt);
 
                 $crypto = Cryptos::where('name', $crypto_txt)->first();
-                $text_2 = PHP_EOL . 'Última señal ' . $crypto->last_signal .' el día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') . ' - Valor: ' . $crypto->price;
+                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($crypto->last_signal) .' . El día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') . ' - Valor: ' . $crypto->price;
             } else {
                 $text = $this->stockController->analisys($response['message']['text']);
                 $stock = Stock::where('name', $response['message']['text'])->first();
 
-                $text_2 = PHP_EOL . 'Última señal ' . $stock->last_signal .' el día  ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d');
+                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($stock->last_signal) .'. El día  ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d');
             }
 
             if(!$text) {
