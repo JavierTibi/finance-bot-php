@@ -40,17 +40,19 @@ class WebhookController extends Controller
 
             $response = $telegram->getWebhookUpdate();
 
-            if(in_array(strtoupper($response['message']['text']), ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'FTT', 'CAKE', 'DOGE', 'SHIB', 'AVAX', 'DOT', 'ALGO'])){
+            $crypto_array = ['BTC', 'ETH', 'ADA', 'SOL', 'MATIC', 'FTT', 'CAKE', 'DOGE', 'SHIB', 'AVAX', 'DOT', 'ALGO', 'LTC', 'ATOM', 'UNI', 'LINK', 'LUNA', 'BNB', 'XRP', 'TRX', 'NEAR', 'BCH', 'XLM', 'FTM', 'MANA']
+
+            if(in_array(strtoupper($response['message']['text']), $crypto_array)){
                 $crypto_txt = 'BINANCE:'.$response['message']['text'].'USDT';
                 $text = $this->cryptoController->cryptoAnalysis(strtoupper($crypto_txt));
 
                 $crypto = Cryptos::where('name', $crypto_txt)->first();
-                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($crypto->last_signal) .' . El día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') . ' - Valor: ' . $crypto->price;
+                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($crypto->last_signal) ?? '*sin valor*' .' . El día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') ?? '*sin valor*' . ' - Valor: ' . $crypto->price ?? '*sin valor*';
             } else {
                 $text = $this->stockController->analisys(strtoupper($response['message']['text']));
                 $stock = Stock::where('name', $response['message']['text'])->first();
 
-                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($stock->last_signal) .'. El día  ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d');
+                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($stock->last_signal) ?? '*sin valor*' .'. El día  ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d') ?? '*sin valor*';
             }
 
             if(!$text) {
