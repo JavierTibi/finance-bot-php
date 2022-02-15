@@ -45,25 +45,23 @@ class WebhookController extends Controller
             if(in_array(strtoupper($response['message']['text']), $crypto_array)){
                 $crypto_txt = 'BINANCE:'.$response['message']['text'].'USDT';
                 $text = $this->cryptoController->cryptoAnalysis(strtoupper($crypto_txt));
-
-                $crypto = Cryptos::where('name', $crypto_txt)->first();
-                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($crypto->last_signal) ?? '*sin valor*' .' . El día  ' . Carbon::parse($crypto->date_last_signal)->format('Y-m-d') ?? '*sin valor*' . ' - Valor: ' . $crypto->price ?? '*sin valor*';
+                $result = Cryptos::where('name', $crypto_txt)->first();
             } else {
                 $text = $this->stockController->analisys(strtoupper($response['message']['text']));
-                $stock = Stock::where('name', $response['message']['text'])->first();
-
-                $text_2 = PHP_EOL . 'Última señal: ' . strtoupper($stock->last_signal) ?? '*sin valor*' .'. El día  ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d') ?? '*sin valor*';
+                $result = Stock::where('name', $response['message']['text'])->first();
             }
 
             if(!$text) {
-                $text = '*Sin movimientos importantes*';
+                $signal = ($result->last_signal == 'buy') ? 'COMPRA' : 'VENTA';
+                $text =  'La última señal fue de ' . $signal ?? '*sin valor*' .'  el día  ' . Carbon::parse($result->date_last_signal)->format('d/m/Y') ?? '*sin valor*';
             }
-            $text .= $text_2;
+
             $telegram->sendMessage([
                 'chat_id' => $response['message']['chat']['id'],
                 'text' => $text,
                 'parse_mode' => 'MARKDOWN'
             ]);
+
         } catch (\Exception $exception) {
             $telegram->sendMessage([
                 'chat_id' => $response['message']['chat']['id'],

@@ -75,11 +75,11 @@ class StockController extends Controller
             $to = Carbon::now()->timestamp;
             $from = Carbon::now()->subYear()->timestamp;
 
-            $response = YahooFinanceService::call_curl('ws/insights/v1/finance/insights?symbol=' . $stock);
-
-            if(isset($response->finance->result->instrumentInfo)) {
-                $technicalEvents = $response->finance->result->instrumentInfo->technicalEvents;
-            }
+//            $response = YahooFinanceService::call_curl('ws/insights/v1/finance/insights?symbol=' . $stock);
+//
+//            if(isset($response->finance->result->instrumentInfo)) {
+//                $technicalEvents = $response->finance->result->instrumentInfo->technicalEvents;
+//            }
 
             $rsi = FinnhubService::rsi($stock, $from, $to);
             $sma9 = FinnhubService::technicalIndicator($stock, $from, $to, 9);
@@ -101,15 +101,17 @@ class StockController extends Controller
             $sma80 = $sma80[$i];
             $sma200 = $sma200[$i];
 
+            $stock_obj = Stock::where('name', $stock)->first();
 
             //COMPRA
             $condition_buy_2 = ($vol > $avg);
             $condition_buy_3  = ($price > $sma9 && $sma9 > $sma18  && $sma18 > $sma80);
-            $condition_buy_4 = $rsi[$i] < $rsi[$i-1] && $rsi[$i] >= 80 && $rsi[$i] < 82;
+            $condition_buy_4 = $rsi[$i] >= 80 && $rsi[$i-1] < 80;
             $condition_buy_5 = isset($sma200[$i-50]) && $sma200[$i] > $sma200[$i-50];
-            $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
+           // $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
+            $condition_buy_7 = ($stock_obj->last_signal == "sell");
 
-            if($condition_buy_2 && ($condition_buy_3 || $condition_buy_4) && $condition_buy_5 && $condition_buy_6) {
+            if($condition_buy_2 && ($condition_buy_3 || $condition_buy_4) && $condition_buy_5 && /*$condition_buy_6 &&*/ $condition_buy_7) {
                 $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
                 Stock::updateOrCreate(
@@ -125,11 +127,12 @@ class StockController extends Controller
             //VENTA
             $condition_sell_2 = ($vol > $avg);
             $condition_sell_3 = ($price < $sma9 && $sma9 < $sma18 && $sma18 < $sma80);
-            $condition_sell_4 = $rsi[$i] < $rsi[$i-1] && $rsi[$i] >= 80 && $rsi[253] < 82;
-            $condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
+            $condition_sell_4 = $rsi[$i] < 80 && $rsi[$i-1] >= 80;
+            //$condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
+            $condition_sell_6 = ($stock_obj->last_signal == "buy");
 
 
-            if($condition_sell_2 && ($condition_sell_3 || $condition_sell_4) && $condition_sell_5) {
+            if($condition_sell_2 && ($condition_sell_3 || $condition_sell_4) && /*$condition_sell_5 &&*/ $condition_sell_6) {
                 $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
                 Stock::updateOrCreate(
                     [

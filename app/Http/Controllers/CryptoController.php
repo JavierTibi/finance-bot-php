@@ -99,7 +99,7 @@ class CryptoController extends Controller
             $condition_sell_2 = ($rsi[$i] < $rsi[$i-1]);
             $condition_sell_3 =  ($crypto->last_signal == 'buy');
 
-            if($condition_sell_1 && $condition_sell_2) {
+            if($condition_sell_1 && $condition_sell_2 && $condition_sell_3) {
                 $text = 'VENTA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F98B0') ;
 
                 Cryptos::updateOrCreate(
