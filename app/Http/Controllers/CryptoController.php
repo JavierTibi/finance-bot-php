@@ -72,11 +72,15 @@ class CryptoController extends Controller
             $i = count($rsi) - 1;
             $price = $candles['c'][$i];
 
+            $crypto = Cryptos::where('name', $crypto_name)->first();
+
             //COMPRA
             $condition_buy_1 = ($rsi[$i] > 55 && $rsi[$i-1] < 55);
             $condition_buy_2 = ($rsi[$i] > $rsi[$i-1]);
+            $condition_buy_3 = ($crypto->last_signal == 'sell');
 
-            if($condition_buy_1 && $condition_buy_2) {
+
+            if($condition_buy_1 && $condition_buy_2 && $condition_buy_3) {
                 $text = 'COMPRA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
                 Cryptos::updateOrCreate(
@@ -93,6 +97,7 @@ class CryptoController extends Controller
             //VENTA
             $condition_sell_1 = ($rsi[$i] < 40 && $rsi[$i-1] > 40);
             $condition_sell_2 = ($rsi[$i] < $rsi[$i-1]);
+            $condition_sell_3 =  ($crypto->last_signal == 'buy');
 
             if($condition_sell_1 && $condition_sell_2) {
                 $text = 'VENTA: **' . $crypto_txt[0] .'** - Precio: **' . $price . '** '. hex2bin('F09F98B0') ;
@@ -110,7 +115,7 @@ class CryptoController extends Controller
 
             return $text;
         } catch (\Exception $exception) {
-            return 'Lo siento, no puedo analizar eso';
+            return 'No pude encontrar la crypto: ' . $crypto_name. '. Intentemos con otra!';
         }
     }
 }
