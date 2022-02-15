@@ -73,7 +73,7 @@ class CryptoController extends Controller
             $price = $candles['c'][$i];
 
             //COMPRA
-            $condition_buy_1 = ($rsi[$i] > 55);
+            $condition_buy_1 = ($rsi[$i] > 55 && $rsi[$i-1] < 55);
             $condition_buy_2 = ($rsi[$i] > $rsi[$i-1]);
 
             if($condition_buy_1 && $condition_buy_2) {
@@ -91,7 +91,7 @@ class CryptoController extends Controller
             }
 
             //VENTA
-            $condition_sell_1 = ($rsi[$i] < 40);
+            $condition_sell_1 = ($rsi[$i] < 40 && $rsi[$i-1] > 40);
             $condition_sell_2 = ($rsi[$i] < $rsi[$i-1]);
 
             if($condition_sell_1 && $condition_sell_2) {
