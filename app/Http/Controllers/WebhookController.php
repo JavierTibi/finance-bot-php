@@ -53,7 +53,7 @@ class WebhookController extends Controller
 
             if(!$text) {
                 $signal = ($result->last_signal == 'buy') ? 'COMPRA' : 'VENTA';
-                $text =  'La última señal fue de **' . $signal ?? '*sin valor*' .'**  el día  ' . Carbon::createFromFormat('d/m/Y', $result->date_last_signal) ?? '*sin valor*';
+                $text =  'La última señal fue de **' . $signal ?? '*sin valor*' .'**  el día  ' . Carbon::parse($result->date_last_signal)->format('Y-m-d') ?? '*sin valor*';
             }
 
             $telegram->sendMessage([
