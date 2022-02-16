@@ -52,7 +52,7 @@ class WebhookController extends Controller
             }
 
             if(!$text) {
-                $date = Carbon::parse($result->date_last_signal)->format('d/m/Y') ?? '*sin valor*';
+                $date = !is_null($result->date_last_signal) ? Carbon::parse($result->date_last_signal)->format('d/m/Y') : '*sin valor*';
                 if($result->last_signal == 'buy') {
                     $signal = 'COMPRA';
                 } else if ($result->last_signal == 'sell') {
