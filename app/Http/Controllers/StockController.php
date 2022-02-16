@@ -89,7 +89,7 @@ class StockController extends Controller
             $candles = FinnhubService::stockCandles($stock, $from, $to);
             $i = count($sma200) - 1;
 
-            if(!isset($technicalEvents) || !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i]) || !isset($sma200[$i])) {
+            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i]) || !isset($sma200[$i])) {
                 return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
             }
 
