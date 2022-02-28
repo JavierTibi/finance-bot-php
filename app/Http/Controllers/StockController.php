@@ -102,7 +102,7 @@ class StockController extends Controller
             $sma80 = $sma80[$i];
            // $sma200 = $sma200[$i];
 
-            //$stock_obj = Stock::where('name', $stock)->first();
+            $stock_obj = Stock::where('name', $stock)->first();
 
             //COMPRA
             $condition_buy_2 = ($vol > $avg );
@@ -110,9 +110,9 @@ class StockController extends Controller
           //  $condition_buy_4 = $rsi[$i] >= 80 && $rsi[$i-1] < 80;
           //  $condition_buy_5 = isset($sma200[$i-50]) && $sma200[$i] > $sma200[$i-50];
            // $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
-           // $condition_buy_7 = ($stock_obj->last_signal == "sell");
+            $condition_buy_7 = ($stock_obj->last_signal == "sell" || is_null($stock_obj->last_signal));
 
-            if($condition_buy_2 && $condition_buy_3) {
+            if($condition_buy_2 && $condition_buy_3 && $condition_buy_7) {
                 $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
                 Stock::updateOrCreate(
@@ -130,10 +130,10 @@ class StockController extends Controller
             $condition_sell_3 = ($sma18 < $sma80);
             //$condition_sell_4 = $rsi[$i] < 80 && $rsi[$i-1] >= 80;
             //$condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
-            //$condition_sell_6 = ($stock_obj->last_signal == "buy");
+            $condition_sell_6 = ($stock_obj->last_signal == "buy" || is_null($stock_obj->last_signal));
 
 
-            if($condition_sell_2 && $condition_sell_3) {
+            if($condition_sell_2 && $condition_sell_3 && $condition_sell_6) {
                 $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
                 Stock::updateOrCreate(
                     [
