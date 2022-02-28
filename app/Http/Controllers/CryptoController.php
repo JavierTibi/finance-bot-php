@@ -75,7 +75,7 @@ class CryptoController extends Controller
             $crypto = Cryptos::where('name', $crypto_name)->first();
 
             //COMPRA
-            $condition_buy_1 = ($rsi[$i] > 55 && $rsi[$i-1] < 55);
+            $condition_buy_1 = ($rsi[$i] > 60 && $rsi[$i-1] < 60);
             $condition_buy_2 = ($rsi[$i] > $rsi[$i-1]);
             $condition_buy_3 = ($crypto->last_signal == 'sell');
 
@@ -115,7 +115,7 @@ class CryptoController extends Controller
 
             return $text;
         } catch (\Exception $exception) {
-            return 'No pude encontrar la crypto: ' . $crypto_name. '. Intentemos con otra!';
+            //return 'No pude encontrar la crypto: ' . $crypto_name. '. Intentemos con otra!';
         }
     }
 }

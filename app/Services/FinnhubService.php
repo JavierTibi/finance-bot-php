@@ -40,6 +40,14 @@ class FinnhubService
         return isset(json_decode($technicalSMA[0])->sma) ? json_decode($technicalSMA[0])->sma : [];
     }
 
+    static public function obv($stock, $from, $to, $time_period = null){
+        $client = (new FinnhubService)->init();
+        $indicatorFields = new \stdClass();
+        $indicatorFields->timeperiod = $time_period ?? self::TIMEPERIOD;
+        $result = $client->technicalIndicator($stock, "D", $from, $to, "obv");
+        return isset(json_decode($result[0])->obv) ? json_decode($result[0])->obv : [];
+    }
+
     /**
      * @param $stock
      * @param $from
