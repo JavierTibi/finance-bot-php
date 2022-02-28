@@ -37,13 +37,13 @@ class StockController extends Controller
             }
 
             $text = $this->analisys($stock_name);
-/*            if($text) {
+            if($text) {
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
                     'parse_mode' => 'MARKDOWN'
                 ]);
-            }*/
+            }
 
             return response([
                 'error' => false,
@@ -85,11 +85,11 @@ class StockController extends Controller
             $sma9 = FinnhubService::technicalIndicator($stock, $from, $to, 9);
             $sma18 = FinnhubService::technicalIndicator($stock, $from, $to, 25);
             $sma80 = FinnhubService::technicalIndicator($stock, $from, $to, 70);
-            $sma200 = FinnhubService::technicalIndicator($stock, $from, $to, 200);
+           // $sma200 = FinnhubService::technicalIndicator($stock, $from, $to, 200);
             $candles = FinnhubService::stockCandles($stock, $from, $to);
-            $i = count($sma200) - 1;
+            $i = count($candles['v'] ) - 1;
 
-            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i]) || !isset($sma200[$i])) {
+            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i])) {
                 return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
             }
 
@@ -99,9 +99,9 @@ class StockController extends Controller
             $sma9 = $sma9[$i];
             $sma18 = $sma18[$i];
             $sma80 = $sma80[$i];
-            $sma200 = $sma200[$i];
+           // $sma200 = $sma200[$i];
 
-            $stock_obj = Stock::where('name', $stock)->first();
+            //$stock_obj = Stock::where('name', $stock)->first();
 
             //COMPRA
             $condition_buy_2 = ($vol > $avg );
