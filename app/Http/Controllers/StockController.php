@@ -37,14 +37,14 @@ class StockController extends Controller
             }
 
             $text = $this->analisys($stock_name);
-            /*dd($text);
+
             if($text) {
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
                     'parse_mode' => 'MARKDOWN'
                 ]);
-            }*/
+            }
 
             return response([
                 'error' => false,
@@ -106,7 +106,7 @@ class StockController extends Controller
 
             //COMPRA
             $condition_buy_2 = ($vol > $avg );
-            $condition_buy_3  = ($price > $sma9[$i] && $sma9[$i] > $sma18[$i]  && $sma18[$i] > $sma80[$i]);
+            $condition_buy_3  = ($price > $sma9 && $sma9 > $sma18  && $sma18 > $sma80);
           //  $condition_buy_4 = $rsi[$i] >= 80 && $rsi[$i-1] < 80;
           //  $condition_buy_5 = isset($sma200[$i-50]) && $sma200[$i] > $sma200[$i-50];
            // $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
@@ -127,7 +127,7 @@ class StockController extends Controller
 
             //VENTA
             $condition_sell_2 = ($vol > $avg);
-            $condition_sell_3 = ($sma18[$i] < $sma80[$i]);
+            $condition_sell_3 = ($sma18 < $sma80);
             //$condition_sell_4 = $rsi[$i] < 80 && $rsi[$i-1] >= 80;
             //$condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
             //$condition_sell_6 = ($stock_obj->last_signal == "buy");
@@ -147,7 +147,6 @@ class StockController extends Controller
 
             return $text;
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
             return 'Lo siento, no puedo analizar eso';
         }
 
