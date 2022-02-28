@@ -42,8 +42,8 @@ class StockController extends Controller
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
                     'parse_mode' => 'MARKDOWN'
-                ]);*/
-            }
+                ]);
+            }*/
 
             return response([
                 'error' => false,
