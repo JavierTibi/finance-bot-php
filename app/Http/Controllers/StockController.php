@@ -37,12 +37,12 @@ class StockController extends Controller
             }
 
             $text = $this->analisys($stock_name);
-            if($text) {
+/*            if($text) {
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
                     'parse_mode' => 'MARKDOWN'
-                ]);
+                ]);*/
             }
 
             return response([
