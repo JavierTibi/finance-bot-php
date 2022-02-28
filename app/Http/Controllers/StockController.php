@@ -37,13 +37,14 @@ class StockController extends Controller
             }
 
             $text = $this->analisys($stock_name);
+            /*dd($text);
             if($text) {
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
                     'parse_mode' => 'MARKDOWN'
                 ]);
-            }
+            }*/
 
             return response([
                 'error' => false,
@@ -87,7 +88,7 @@ class StockController extends Controller
             $sma80 = FinnhubService::technicalIndicator($stock, $from, $to, 70);
            // $sma200 = FinnhubService::technicalIndicator($stock, $from, $to, 200);
             $candles = FinnhubService::stockCandles($stock, $from, $to);
-            $i = count($candles['v'] ) - 1;
+            $i = (int) count($candles['v'] ) - 1;
 
             if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i])) {
                 return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
@@ -146,6 +147,7 @@ class StockController extends Controller
 
             return $text;
         } catch (\Exception $exception) {
+            dd($exception->getMessage());
             return 'Lo siento, no puedo analizar eso';
         }
 
