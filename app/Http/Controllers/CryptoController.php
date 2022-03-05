@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cryptos;
+use App\Models\LogHistorial;
 use App\Models\PriceAlert;
 use App\Models\Stock;
 use App\Services\FinnhubService;
@@ -92,6 +93,9 @@ class CryptoController extends Controller
                         'date_last_signal' => Carbon::now()->format('Y-m-d'),
                         'price' => $price
                     ]);
+
+                LogHistorial::create([ 'name' => $crypto_name, 'price' => $price, 'signal' => 'buy' ]);
+
             }
 
             //VENTA
@@ -111,6 +115,9 @@ class CryptoController extends Controller
                         'date_last_signal' => Carbon::now()->format('Y-m-d'),
                         'price' => $price
                     ]);
+
+                LogHistorial::create([ 'name' => $crypto_name, 'price' => $price, 'signal' => 'sell' ]);
+
             }
 
             return $text;

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogHistorial;
 use App\Models\PriceAlert;
 use App\Models\Stock;
 use App\Services\FinnhubService;
@@ -123,6 +124,8 @@ class StockController extends Controller
                         'last_signal' => 'buy',
                         'date_last_signal' => Carbon::now()->format('Y-m-d')
                     ]);
+
+                LogHistorial::create([ 'name' => $stock, 'price' => $price, 'signal' => 'buy' ]);
             }
 
             //VENTA
@@ -143,6 +146,9 @@ class StockController extends Controller
                         'last_signal' => 'sell',
                         'date_last_signal' => Carbon::now()->format('Y-m-d')
                     ]);
+
+                LogHistorial::create([ 'name' => $stock, 'price' => $price, 'signal' => 'sell' ]);
+
             }
 
             return $text;
