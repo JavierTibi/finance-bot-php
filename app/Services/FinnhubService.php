@@ -29,14 +29,15 @@ class FinnhubService
      * @param $from
      * @param $to
      * @param $time_period
+     * @param $indicator
      * @return array
      * @throws Finnhub\ApiException
      */
-    static public function technicalIndicator($stock, $from, $to, $time_period = null){
+    static public function technicalIndicator($stock, $from, $to, $time_period = null, $indicator = "sma"){
         $client = (new FinnhubService)->init();
         $indicatorFields = new \stdClass();
         $indicatorFields->timeperiod = $time_period ?? self::TIMEPERIOD;
-        $technicalSMA = $client->technicalIndicator($stock, "D", $from, $to, "sma", $indicatorFields);
+        $technicalSMA = $client->technicalIndicator($stock, "D", $from, $to, $indicator, $indicatorFields);
         return isset(json_decode($technicalSMA[0])->sma) ? json_decode($technicalSMA[0])->sma : [];
     }
 

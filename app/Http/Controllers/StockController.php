@@ -63,6 +63,26 @@ class StockController extends Controller
 
     }
 
+    private function alertW30($stock, $price_today, $price_yesterday, $w30_today, $w30_yesterday) {
+
+        if($w30_yesterday <= $price_yesterday && $w30_today > $price_today) {
+            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN ALZA: ** - PRECIO: ' . $price_today . '** ' ;
+        }
+
+        if($w30_yesterday >= $price_yesterday && $w30_today < $price_today) {
+            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN BAJA: ** - PRECIO: ' . $price_today . '** ' ;
+        }
+
+        if($text) {
+            $telegram = TelegramService::new();
+            $telegram->sendMessage([
+                'chat_id' => '@ageofinvestments',
+                'text' => $text,
+                'parse_mode' => 'MARKDOWN'
+            ]);
+        }
+    }
+
     /**
      * The magic code
      *
@@ -84,6 +104,7 @@ class StockController extends Controller
 //            }
 
             //$rsi = FinnhubService::rsi($stock, $from, $to);
+            $wma30 = FinnhubService::technicalIndicator($stock, $from, $to, 30, "wma");
             $sma9 = FinnhubService::technicalIndicator($stock, $from, $to, 9);
             $sma18 = FinnhubService::technicalIndicator($stock, $from, $to, 25);
             $sma80 = FinnhubService::technicalIndicator($stock, $from, $to, 70);
@@ -104,6 +125,9 @@ class StockController extends Controller
            // $sma200 = $sma200[$i];
 
             $stock_obj = Stock::where('name', $stock)->first();
+
+            //ALERT W30
+            $this->alertW30($stock, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //COMPRA
             $condition_buy_2 = ($vol > $avg );
