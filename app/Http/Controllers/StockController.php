@@ -81,6 +81,7 @@ class StockController extends Controller
                 'parse_mode' => 'MARKDOWN'
             ]);
         }
+
     }
 
     /**
