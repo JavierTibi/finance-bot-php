@@ -39,13 +39,13 @@ class StockController extends Controller
 
             $text = $this->analisys($stock_name);
 
-            if($text) {
-                $telegram->sendMessage([
-                    'chat_id' => '@ageofinvestments',
-                    'text' => $text,
-                    'parse_mode' => 'MARKDOWN'
-                ]);
-            }
+//            if($text) {
+//                $telegram->sendMessage([
+//                    'chat_id' => '@ageofinvestments',
+//                    'text' => $text,
+//                    'parse_mode' => 'MARKDOWN'
+//                ]);
+//            }
 
             return response([
                 'error' => false,
@@ -73,7 +73,28 @@ class StockController extends Controller
             $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN BAJA: ** - PRECIO: ' . $price_today . '** ' ;
         }
 
-        if($text) {
+        if(isset($text)) {
+            $telegram = TelegramService::new();
+            $telegram->sendMessage([
+                'chat_id' => '@ageofinvestments',
+                'text' => $text,
+                'parse_mode' => 'MARKDOWN'
+            ]);
+        }
+
+    }
+
+    private function alert($stock, $price, $sma9, $sma18) {
+
+        if($price > $sma9 && $sma9 > $sma18) {
+            $text = 'ALERTA: **' . $stock .'** - CRUZO EN ALZA: ** - PRECIO: ' . $price . '** ' ;
+        }
+
+        if($price < $sma9 && $sma9 < $sma18) {
+            $text = 'ALERTA: **' . $stock .'** - CRUZO EN BAJA: ** - PRECIO: ' . $price . '** ' ;
+        }
+
+        if(isset($text)) {
             $telegram = TelegramService::new();
             $telegram->sendMessage([
                 'chat_id' => '@ageofinvestments',
@@ -107,8 +128,8 @@ class StockController extends Controller
             //$rsi = FinnhubService::rsi($stock, $from, $to);
             $wma30 = FinnhubService::technicalIndicator($stock, $from, $to, 30, "wma");
             $sma9 = FinnhubService::technicalIndicator($stock, $from, $to, 9);
-            $sma18 = FinnhubService::technicalIndicator($stock, $from, $to, 25);
-            $sma80 = FinnhubService::technicalIndicator($stock, $from, $to, 70);
+            $sma18 = FinnhubService::technicalIndicator($stock, $from, $to, 18);
+            $sma80 = FinnhubService::technicalIndicator($stock, $from, $to, 80);
            // $sma200 = FinnhubService::technicalIndicator($stock, $from, $to, 200);
             $candles = FinnhubService::stockCandles($stock, $from, $to);
             $i = (int) count($candles['v'] ) - 1;
@@ -130,15 +151,18 @@ class StockController extends Controller
             //ALERT W30
             $this->alertW30($stock, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
-            //COMPRA
-            $condition_buy_2 = ($vol > $avg );
-            $condition_buy_3  = ($price > $sma9 && $sma9 > $sma18  && $sma18 > $sma80);
-          //  $condition_buy_4 = $rsi[$i] >= 80 && $rsi[$i-1] < 80;
-          //  $condition_buy_5 = isset($sma200[$i-50]) && $sma200[$i] > $sma200[$i-50];
-           // $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
-            $condition_buy_7 = ($stock_obj->last_signal == "sell" || is_null($stock_obj->last_signal));
+            //ALERT
+            $this->alert($stock, $price, $sma9, $sma18);
 
-            if($condition_buy_2 && $condition_buy_3 && $condition_buy_7) {
+            //COMPRA
+/*           $condition_buy_2 = ($vol > $avg );
+            $condition_buy_3  = ($price > $sma9 && $sma9 > $sma18);
+            $condition_buy_4 = $rsi[$i] >= 80 && $rsi[$i-1] < 80;
+            $condition_buy_5 = isset($sma200[$i-50]) && $sma200[$i] > $sma200[$i-50];
+            $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
+            $condition_buy_7 = ($stock_obj->last_signal == "sell" || is_null($stock_obj->last_signal));*/
+
+            if($price > $sma9 && $sma9 > $sma18) {
                 $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 
                 Stock::updateOrCreate(
@@ -154,14 +178,14 @@ class StockController extends Controller
             }
 
             //VENTA
-            $condition_sell_2 = ($vol > $avg);
+            /*$condition_sell_2 = ($vol > $avg);
             $condition_sell_3 = ($sma18 < $sma80);
-            //$condition_sell_4 = $rsi[$i] < 80 && $rsi[$i-1] >= 80;
-            //$condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
-            $condition_sell_6 = ($stock_obj->last_signal == "buy" || is_null($stock_obj->last_signal));
+            $condition_sell_4 = $rsi[$i] < 80 && $rsi[$i-1] >= 80;
+            $condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
+            $condition_sell_6 = ($stock_obj->last_signal == "buy" || is_null($stock_obj->last_signal));*/
 
 
-            if($condition_sell_2 && $condition_sell_3 && $condition_sell_6) {
+            if($price < $sma9 && $sma9 < $sma18) {
                 $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
                 Stock::updateOrCreate(
                     [
