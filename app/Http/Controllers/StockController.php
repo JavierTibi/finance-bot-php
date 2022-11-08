@@ -21,6 +21,41 @@ use React\Http\Browser;
 
 class StockController extends Controller
 {
+    private $stocks = ['AAPL', 'ABNB', 'ADBE', 'AMD', 'AMZN', 'AXP', 'BAC', 'BP', 'C',
+'COST',
+'CVX',
+'DIS',
+'FB',
+'GM',
+'GOOGL',
+'HD',
+'INTC',
+'JPM',
+'KO',
+'MCO',
+'MELI',
+'MSFT',
+'NFLX',
+'NVDA',
+'PLTR',
+'PYPL',
+'SE',
+'SHOP',
+'SPY',
+'SQ',
+'TDOC',
+'TRUE',
+'TSLA',
+'TWLO',
+'UBX',
+'UNH',
+'VIST',
+'WBA',
+'WFC',
+'WMT',
+'XOM',
+'YPF'
+];
     public function getStock(Request $request)
     {
         try {
@@ -146,13 +181,14 @@ class StockController extends Controller
             $sma80 = $sma80[$i];
            // $sma200 = $sma200[$i];
 
-            $stock_obj = Stock::where('name', $stock)->first();
+            //$stock_obj = Stock::where('name', $stock)->first();
+            foreach ($this->stocks as $stock) {
+                //ALERT W30
+                $this->alertW30($stock, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
-            //ALERT W30
-            $this->alertW30($stock, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
-
-            //ALERT
-            $this->alert($stock, $price, $sma9, $sma18);
+                //ALERT
+                $this->alert($stock, $price, $sma9, $sma18);
+            }
 
             //COMPRA
 /*           $condition_buy_2 = ($vol > $avg );
@@ -162,20 +198,20 @@ class StockController extends Controller
             $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
             $condition_buy_7 = ($stock_obj->last_signal == "sell" || is_null($stock_obj->last_signal));*/
 
-            if($price > $sma9 && $sma9 > $sma18) {
-                $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
-
-                Stock::updateOrCreate(
-                    [
-                        'name' => $stock,
-                    ],
-                    [
-                        'last_signal' => 'buy',
-                        'date_last_signal' => Carbon::now()->format('Y-m-d')
-                    ]);
-
-                LogHistorial::create([ 'name' => $stock, 'price' => $price, 'signal' => 'buy' ]);
-            }
+//            if($price > $sma9 && $sma9 > $sma18) {
+//                $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
+//
+//                Stock::updateOrCreate(
+//                    [
+//                        'name' => $stock,
+//                    ],
+//                    [
+//                        'last_signal' => 'buy',
+//                        'date_last_signal' => Carbon::now()->format('Y-m-d')
+//                    ]);
+//
+//                LogHistorial::create([ 'name' => $stock, 'price' => $price, 'signal' => 'buy' ]);
+//            }
 
             //VENTA
             /*$condition_sell_2 = ($vol > $avg);
@@ -185,22 +221,22 @@ class StockController extends Controller
             $condition_sell_6 = ($stock_obj->last_signal == "buy" || is_null($stock_obj->last_signal));*/
 
 
-            if($price < $sma9 && $sma9 < $sma18) {
-                $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
-                Stock::updateOrCreate(
-                    [
-                        'name' => $stock,
-                    ],
-                    [
-                        'last_signal' => 'sell',
-                        'date_last_signal' => Carbon::now()->format('Y-m-d')
-                    ]);
-
-                LogHistorial::create([ 'name' => $stock, 'price' => $price, 'signal' => 'sell' ]);
-
-            }
-
-            return $text;
+//            if($price < $sma9 && $sma9 < $sma18) {
+//                $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
+//                Stock::updateOrCreate(
+//                    [
+//                        'name' => $stock,
+//                    ],
+//                    [
+//                        'last_signal' => 'sell',
+//                        'date_last_signal' => Carbon::now()->format('Y-m-d')
+//                    ]);
+//
+//                LogHistorial::create([ 'name' => $stock, 'price' => $price, 'signal' => 'sell' ]);
+//
+//            }
+//
+//            return $text;
         } catch (\Exception $exception) {
             return 'Lo siento, no puedo analizar eso';
         }
