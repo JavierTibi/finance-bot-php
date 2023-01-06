@@ -68,7 +68,6 @@ class StockController extends Controller
             if(!isset($request->stocks))
             {
                 $stock->updated_at = Carbon::now();
-                $stock->save();
                 $stock_name = $stock->name;
             } else {
                 $stock_name = $request->stocks;
@@ -77,12 +76,15 @@ class StockController extends Controller
             $text = $this->analisys($stock);
 
             if($text) {
+                $stock->last_signal = ($stock->last_signal == 'sell') ? 'buy' : 'sell';
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
                     'parse_mode' => 'MARKDOWN'
                 ]);
             }
+
+            $stock->save();
 
             return response([
                 'error' => false,
