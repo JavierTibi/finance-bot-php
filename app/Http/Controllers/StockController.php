@@ -89,7 +89,7 @@ class StockController extends Controller
 
             return response([
                 'error' => false,
-                'message' => $text ?? 'No hay señal de cambio de tendencia. Última señal: ' . $stock->last_signal . 'el dia ' . $stock->date_last_signal,
+                'message' => $text ?? 'No hay señal de cambio de tendencia. Última señal: ' . strtoupper($stock->last_signal) . ' el día ' . Carbon::parse($stock->date_last_signal)->format('Y-m-d'),
                 'data' => $stock->name,
             ], 200);
 
