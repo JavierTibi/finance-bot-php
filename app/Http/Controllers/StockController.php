@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LogHistorial;
 use App\Models\PriceAlert;
 use App\Models\Stock;
+use App\Services\AnalysisService;
 use App\Services\FinnhubService;
 use App\Services\TelegramService;
 use App\Services\YahooFinanceService;
@@ -56,6 +57,7 @@ class StockController extends Controller
 'XOM',
 'YPF'
 ];
+
     public function getStock(Request $request)
     {
         try {
@@ -72,19 +74,19 @@ class StockController extends Controller
                 $stock_name = $request->stocks;
             }
 
-            $text = $this->analisys($stock_name);
+            $text = $this->analisys($stock);
 
-//            if($text) {
-//                $telegram->sendMessage([
-//                    'chat_id' => '@ageofinvestments',
-//                    'text' => $text,
-//                    'parse_mode' => 'MARKDOWN'
-//                ]);
-//            }
+            if($text) {
+                $telegram->sendMessage([
+                    'chat_id' => '@ageofinvestments',
+                    'text' => $text,
+                    'parse_mode' => 'MARKDOWN'
+                ]);
+            }
 
             return response([
                 'error' => false,
-                'message' => 'Success',
+                'message' => $text ?? 'No hay señal de cambio de tendencia',
                 'data' => $stock_name,
             ], 200);
 
@@ -98,30 +100,30 @@ class StockController extends Controller
 
     }
 
-    private function alertW30($stock, $price_today, $price_yesterday, $w30_today, $w30_yesterday) {
+//    private function alertW30($stock, $price_today, $price_yesterday, $w30_today, $w30_yesterday) {
+//
+//        if($w30_yesterday <= $price_yesterday && $w30_today > $price_today) {
+//            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN ALZA: ** - PRECIO: ' . $price_today . '** ' ;
+//        }
+//
+//        if($w30_yesterday >= $price_yesterday && $w30_today < $price_today) {
+//            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN BAJA: ** - PRECIO: ' . $price_today . '** ' ;
+//        }
+//
+//        if(isset($text)) {
+//            $telegram = TelegramService::new();
+//            $telegram->sendMessage([
+//                'chat_id' => '@ageofinvestments',
+//                'text' => $text,
+//                'parse_mode' => 'MARKDOWN'
+//            ]);
+//        }
+//
+//    }
 
-        if($w30_yesterday <= $price_yesterday && $w30_today > $price_today) {
-            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN ALZA: ** - PRECIO: ' . $price_today . '** ' ;
-        }
+    private function alert($stock, $price, $sma9, $sma18, $last_signal) {
 
-        if($w30_yesterday >= $price_yesterday && $w30_today < $price_today) {
-            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN BAJA: ** - PRECIO: ' . $price_today . '** ' ;
-        }
-
-        if(isset($text)) {
-            $telegram = TelegramService::new();
-            $telegram->sendMessage([
-                'chat_id' => '@ageofinvestments',
-                'text' => $text,
-                'parse_mode' => 'MARKDOWN'
-            ]);
-        }
-
-    }
-
-    private function alert($stock, $price, $sma9, $sma18) {
-
-        if($price > $sma9 && $sma9 > $sma18) {
+        if($price > $sma9 && $sma9 > $sma18 && $last_signal = 'sell') {
             $text = 'ALERTA: **' . $stock .'** - CRUZO EN ALZA: ** - PRECIO: ' . $price . '** ' ;
         }
 
@@ -150,45 +152,28 @@ class StockController extends Controller
 
         try {
 
-            $text = null;
-            $to = Carbon::now()->timestamp;
-            $from = Carbon::now()->subYear()->timestamp;
+            $data = AnalysisService::getData($stock->name);
+            $i = $data['count'];
+            //$avg = array_sum($data['candles']['v']) / count($data['candles']['v']);
+            $price = $data['candles']['c'][$i];
+            $vol = $data['candles']['v'][$i];
+            $sma9 = $data['sma9'][$i];
+            $sma18 = $data['sma18'][$i];
+            $sma80 = $data['sma80'][$i];
+            $wma30  = $data['wma30'];
+            $candles = $data['candles'];
 
-//            $response = YahooFinanceService::call_curl('ws/insights/v1/finance/insights?symbol=' . $stock);
-//
-//            if(isset($response->finance->result->instrumentInfo)) {
-//                $technicalEvents = $response->finance->result->instrumentInfo->technicalEvents;
+//            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i])) {
+//                return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
 //            }
 
-            //$rsi = FinnhubService::rsi($stock, $from, $to);
-            $wma30 = FinnhubService::technicalIndicator($stock, $from, $to, 30, "wma");
-            $sma9 = FinnhubService::technicalIndicator($stock, $from, $to, 9);
-            $sma18 = FinnhubService::technicalIndicator($stock, $from, $to, 18);
-            $sma80 = FinnhubService::technicalIndicator($stock, $from, $to, 80);
-           // $sma200 = FinnhubService::technicalIndicator($stock, $from, $to, 200);
-            $candles = FinnhubService::stockCandles($stock, $from, $to);
-            $i = (int) count($candles['v'] ) - 1;
 
-            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i])) {
-                return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
-            }
 
-            $avg = array_sum($candles['v']) / count($candles['v']);
-            $price = $candles['c'][$i];
-            $vol = $candles['v'][$i];
-            $sma9 = $sma9[$i];
-            $sma18 = $sma18[$i];
-            $sma80 = $sma80[$i];
-           // $sma200 = $sma200[$i];
+            //ALERT W30
+            //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
-            //$stock_obj = Stock::where('name', $stock)->first();
-            foreach ($this->stocks as $stock) {
-                //ALERT W30
-                $this->alertW30($stock, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
-
-                //ALERT
-                $this->alert($stock, $price, $sma9, $sma18);
-            }
+            //ALERT STOCK
+            return AnalysisService::alert($stock->name, $price, $sma9, $sma18, $stock->last_signal);
 
             //COMPRA
 /*           $condition_buy_2 = ($vol > $avg );
@@ -238,10 +223,10 @@ class StockController extends Controller
 //
 //            return $text;
         } catch (\Exception $exception) {
-            return 'Lo siento, no puedo analizar eso';
         }
 
     }
+
 
     //TODO CLEAN CODE
     public function historicalAnalysis(Request $request){

@@ -2,10 +2,10 @@ version: "3.7"
 
 services:
     laravel:
-        image: daxter1987/laravel:1.0.6
+        image: daxter1987/laravel:1.0.8
         container_name: finance-bot
         ports:
-            - "8095:80"
+            - "8088:80"
         volumes:
             - .:/var/www/html
     db:
@@ -14,7 +14,7 @@ services:
         volumes:
             - ./db:/var/lib/mysql
         ports:
-            - "3398:3306"
+            - "3397:3306"
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: db
