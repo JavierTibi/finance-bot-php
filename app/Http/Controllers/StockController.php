@@ -63,14 +63,14 @@ class StockController extends Controller
         try {
             $telegram = TelegramService::new();
 
-            $stock = Stock::orderBy('updated_at', 'ASC')->first();
+
 
             if(!isset($request->stocks))
             {
+                $stock = Stock::orderBy('updated_at', 'ASC')->first();
                 $stock->updated_at = Carbon::now();
-                $stock_name = $stock->name;
             } else {
-                $stock_name = $request->stocks;
+                $stock = Stock::where('name', $request->stocks)->first();
             }
 
             $text = $this->analisys($stock);
@@ -89,7 +89,7 @@ class StockController extends Controller
             return response([
                 'error' => false,
                 'message' => $text ?? 'No hay señal de cambio de tendencia',
-                'data' => $stock_name,
+                'data' => $stock->name,
             ], 200);
 
         } catch (\Exception $exception) {
