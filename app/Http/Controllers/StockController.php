@@ -88,7 +88,7 @@ class StockController extends Controller
 
             return response([
                 'error' => false,
-                'message' => $text ?? 'No hay señal de cambio de tendencia',
+                'message' => $text ?? 'No hay señal de cambio de tendencia. Última señal: ' . $stock->last_signal . 'el dia ' . $stock->updated_at,
                 'data' => $stock->name,
             ], 200);
 
