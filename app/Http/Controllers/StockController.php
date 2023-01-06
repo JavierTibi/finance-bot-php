@@ -77,6 +77,7 @@ class StockController extends Controller
 
             if($text) {
                 $stock->last_signal = ($stock->last_signal == 'sell') ? 'buy' : 'sell';
+                $stock->date_last_signal = Carbon::now()->format('Y-m-d');
                 $telegram->sendMessage([
                     'chat_id' => '@ageofinvestments',
                     'text' => $text,
@@ -88,7 +89,7 @@ class StockController extends Controller
 
             return response([
                 'error' => false,
-                'message' => $text ?? 'No hay señal de cambio de tendencia. Última señal: ' . $stock->last_signal . 'el dia ' . $stock->updated_at,
+                'message' => $text ?? 'No hay señal de cambio de tendencia. Última señal: ' . $stock->last_signal . 'el dia ' . $stock->date_last_signal,
                 'data' => $stock->name,
             ], 200);
 
