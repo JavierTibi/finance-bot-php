@@ -27,9 +27,9 @@ class AnalysisService
 
         return [
             'wma30' =>  FinnhubService::technicalIndicator($stock, $from, $to, 30, "wma"),
-            'sma9' => FinnhubService::technicalIndicator($stock, $from, $to, 9),
-            'sma18' => FinnhubService::technicalIndicator($stock, $from, $to, 18),
-            'sma80' => FinnhubService::technicalIndicator($stock, $from, $to, 80),
+            'ema100' => FinnhubService::technicalIndicator($stock, $from, $to, 100, 'ema'),
+            'sma200' => FinnhubService::technicalIndicator($stock, $from, $to, 200),
+            //'sma80' => FinnhubService::technicalIndicator($stock, $from, $to, 80),
             'candles' => $candles,
             'count' => count($candles['v'] ) - 1
         ];
@@ -58,17 +58,17 @@ class AnalysisService
     /**
      * @param $stock
      * @param $price
-     * @param $sma9
-     * @param $sma18
+     * @param $signal_1
+     * @param $signal_2
      * @param $last_signal
      * @return string|void
      */
-    public static function alert($stock, $price, $sma9, $sma18, $last_signal) {
-        if($price > $sma9 && $sma9 > $sma18 && $last_signal == 'sell') {
+    public static function alert($stock, $price, $signal_1, $signal_2, $last_signal) {
+        if($price > $signal_1 && $signal_1 > $signal_2 && $last_signal == 'sell') {
             return 'ALERTA: **' . $stock .'** - CRUZO EN ALZA: ** - PRECIO: ' . $price . '** ' ;
         }
 
-        if($price < $sma9 && $sma9 < $sma18 && $last_signal == 'buy') {
+        if($price < $signal_1 && $signal_1 < $signal_2 && $last_signal == 'buy') {
             return 'ALERTA: **' . $stock .'** - CRUZO EN BAJA: ** - PRECIO: ' . $price . '** ' ;
         }
     }

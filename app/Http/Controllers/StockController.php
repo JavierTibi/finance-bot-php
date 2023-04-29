@@ -156,17 +156,18 @@ class StockController extends Controller
         try {
 
             $data = AnalysisService::getData($stock->name);
+
             $i = $data['count'];
             //$avg = array_sum($data['candles']['v']) / count($data['candles']['v']);
             $price = $data['candles']['c'][$i];
             $vol = $data['candles']['v'][$i];
-            $sma9 = $data['sma9'][$i];
-            $sma18 = $data['sma18'][$i];
-            $sma80 = $data['sma80'][$i];
-            $wma30  = $data['wma30'];
+            $ema100 = $data['ema100'][$i];
+            $sma200 = $data['sma200'][$i];
+            //$sma80 = $data['sma80'][$i];
+            //$wma30  = $data['wma30'];
             $candles = $data['candles'];
 
-//            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($sma9[$i]) || !isset($sma18[$i]) || !isset($sma80[$i])) {
+//            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($ema100[$i]) || !isset($sma200[$i]) || !isset($sma80[$i])) {
 //                return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
 //            }
 
@@ -176,17 +177,17 @@ class StockController extends Controller
             //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //ALERT STOCK
-            return AnalysisService::alert($stock->name, $price, $sma9, $sma18, $stock->last_signal);
+            return AnalysisService::alert($stock->name, $price, $ema100, $sma200, $stock->last_signal);
 
             //COMPRA
 /*           $condition_buy_2 = ($vol > $avg );
-            $condition_buy_3  = ($price > $sma9 && $sma9 > $sma18);
+            $condition_buy_3  = ($price > $ema100 && $ema100 > $sma200);
             $condition_buy_4 = $rsi[$i] >= 80 && $rsi[$i-1] < 80;
             $condition_buy_5 = isset($sma200[$i-50]) && $sma200[$i] > $sma200[$i-50];
             $condition_buy_6 = $technicalEvents->midTerm != "down" || $technicalEvents->longTerm != "down";
             $condition_buy_7 = ($stock_obj->last_signal == "sell" || is_null($stock_obj->last_signal));*/
 
-//            if($price > $sma9 && $sma9 > $sma18) {
+//            if($price > $ema100 && $ema100 > $sma200) {
 //                $text = 'COMPRA: **' . $stock .'** - Precio: **' . $price . '** '. hex2bin('F09F9388') ;
 //
 //                Stock::updateOrCreate(
@@ -203,13 +204,13 @@ class StockController extends Controller
 
             //VENTA
             /*$condition_sell_2 = ($vol > $avg);
-            $condition_sell_3 = ($sma18 < $sma80);
+            $condition_sell_3 = ($sma200 < $sma80);
             $condition_sell_4 = $rsi[$i] < 80 && $rsi[$i-1] >= 80;
             $condition_sell_5 = $technicalEvents->midTerm != "up" || $technicalEvents->longTerm != "up";
             $condition_sell_6 = ($stock_obj->last_signal == "buy" || is_null($stock_obj->last_signal));*/
 
 
-//            if($price < $sma9 && $sma9 < $sma18) {
+//            if($price < $ema100 && $ema100 < $sma200) {
 //                $text = 'VENTA **' . $stock .'** - Precio: **' . $price .'** ' . hex2bin('F09F98B0') ;
 //                Stock::updateOrCreate(
 //                    [
