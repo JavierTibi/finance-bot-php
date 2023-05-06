@@ -69,13 +69,23 @@ class AnalysisService
      * @param $last_signal
      * @return string|void
      */
-    public static function alert($stock, $price, $signal_1, $signal_2, $last_signal) {
-        if($price > $signal_1 && $signal_1 > $signal_2 && $last_signal == 'sell') {
-            return 'ALERTA: **' . $stock .'** - CRUZO EN ALZA: ** - PRECIO: ' . $price . '** ' ;
+    public static function alert($stock, $price, $signal_1, $signal_2, $last_signal = null) {
+        if($last_signal) {
+            if($price > $signal_1 && $signal_1 > $signal_2 && $last_signal == 'sell') {
+                return 'ALERTA: **' . $stock .'** - CRUZO EN ALZA: ** - PRECIO: ' . $price . '** ' ;
+            }
+
+            if($price < $signal_1 && $signal_1 < $signal_2 && $last_signal == 'buy') {
+                return 'ALERTA: **' . $stock .'** - CRUZO EN BAJA: ** - PRECIO: ' . $price . '** ' ;
+            }
         }
 
+        if($price > $signal_1 && $signal_1 > $signal_2) {
+            return '**' . $stock .'** - ESTA EN ALZA: ** - PRECIO: ' . $price . '** ' ;
+        }
         if($price < $signal_1 && $signal_1 < $signal_2 && $last_signal == 'buy') {
-            return 'ALERTA: **' . $stock .'** - CRUZO EN BAJA: ** - PRECIO: ' . $price . '** ' ;
+            return '**' . $stock .'** - ESTA EN BAJA: ** - PRECIO: ' . $price . '** ' ;
         }
     }
+
 }
