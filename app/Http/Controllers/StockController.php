@@ -178,7 +178,7 @@ class StockController extends Controller
                 $name_stock = $stock->name;
                 $last_signal = $stock->last_signal;
             } else {
-                $name = $stock;
+                $name_stock = $stock;
                 $last_signal = null;
             }
 
