@@ -18,6 +18,7 @@ use App\Http\Controllers\CryptoController;
 
 //Stock
 Route::get('stock', [StockController::class, 'getStock']);
+Route::get('request_stock', [StockController::class, 'getRequestStock']);
 Route::get('historic', [StockController::class, 'historicalAnalysis']);
 Route::post('webhook', [WebhookController::class, 'webhook']);
 
