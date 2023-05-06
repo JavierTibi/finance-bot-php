@@ -168,14 +168,21 @@ class StockController extends Controller
     /**
      * The magic code
      * @param $stock
-     * @param $short_term
+     * @param bool $short_term
      * @return string|void|null
      */
-    public function analisys($stock, $short_term = false) {
+    public function analisys($stock, bool $short_term = false) {
 
         try {
+            if(is_object($stock)) {
+                $name_stock = $stock->name;
+                $last_signal = $stock->last_signal;
+            } else {
+                $name = $stock;
+                $last_signal = null;
+            }
 
-            $data = AnalysisService::getData($stock->name, $short_term);
+            $data = AnalysisService::getData($name_stock, $short_term);
 
             $i = $data['count'];
             //$avg = array_sum($data['candles']['v']) / count($data['candles']['v']);
@@ -195,10 +202,7 @@ class StockController extends Controller
             //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //ALERT STOCK
-            if(is_object($stock)) {
-                return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2, $stock->last_signal);
-            }
-            return AnalysisService::alert($stock, $price, $indicador_1, $indicador_2);
+            return AnalysisService::alert($name_stock, $price, $indicador_1, $indicador_2, $last_signal);
 
         } catch (\Exception $exception) {
             return $exception->getMessage();
