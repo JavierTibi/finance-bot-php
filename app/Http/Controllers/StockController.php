@@ -167,9 +167,9 @@ class StockController extends Controller
 
     /**
      * The magic code
-     *
      * @param $stock
-     * @return string
+     * @param $short_term
+     * @return string|void|null
      */
     public function analisys($stock, $short_term = false) {
 
@@ -195,9 +195,13 @@ class StockController extends Controller
             //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //ALERT STOCK
-            return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2, $stock->last_signal ?? null);
+            if(isset($stock->last_signal)) {
+                return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2, $stock->last_signal);
+            }
+            return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2);
 
         } catch (\Exception $exception) {
+            return $exception->getMessage();
         }
 
     }
