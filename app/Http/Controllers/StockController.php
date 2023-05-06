@@ -195,10 +195,10 @@ class StockController extends Controller
             //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //ALERT STOCK
-            if(isset($stock->last_signal)) {
+            if(is_object($stock)) {
                 return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2, $stock->last_signal);
             }
-            return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2);
+            return AnalysisService::alert($stock, $price, $indicador_1, $indicador_2);
 
         } catch (\Exception $exception) {
             return $exception->getMessage();
