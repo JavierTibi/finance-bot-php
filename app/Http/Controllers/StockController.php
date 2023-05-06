@@ -58,22 +58,42 @@ class StockController extends Controller
 'YPF'
 ];
 
+    public function getRequestStock(Request $request) {
+        try {
+            $data = $request->all();
+            $text = $this->analisys($data['stock'], $data['short_term']);
+            return response([
+                'error' => false,
+                'message' => $text,
+                'data' => $data['stock'],
+            ], 200);
+        } catch (\Exception $exception) {
+            return response([
+                'error' => true,
+                'message' => $exception->getMessage(),
+                'data' => $request->stock,
+            ], 400);
+        }
+    }
+
     public function getStock(Request $request)
     {
         try {
             $telegram = TelegramService::new();
 
-
-
-            if(!isset($request->stocks))
+            if(!isset($request->stock))
             {
                 $stock = Stock::orderBy('updated_at', 'ASC')->first();
                 $stock->updated_at = Carbon::now();
             } else {
-                $stock = Stock::where('name', $request->stocks)->first();
+                $stock = Stock::where('name', $request->stock)->first();
             }
 
-            $text = $this->analisys($stock);
+            if(in_array($stock, ['TQQQ', 'UPRO'])) {
+                $text = $this->analisys($stock, true);
+            } else {
+                $text = $this->analisys($stock);
+            }
 
             if($text) {
                 $stock->last_signal = ($stock->last_signal == 'sell') ? 'buy' : 'sell';
@@ -151,18 +171,18 @@ class StockController extends Controller
      * @param $stock
      * @return string
      */
-    public function analisys($stock) {
+    public function analisys($stock, $short_term = false) {
 
         try {
 
-            $data = AnalysisService::getData($stock->name);
+            $data = AnalysisService::getData($stock->name, $short_term);
 
             $i = $data['count'];
             //$avg = array_sum($data['candles']['v']) / count($data['candles']['v']);
             $price = $data['candles']['c'][$i];
             $vol = $data['candles']['v'][$i];
-            $ema100 = $data['ema100'][$i];
-            $sma200 = $data['sma200'][$i];
+            $indicador_1 = $data['indicador_1'][$i];
+            $indicador_2 = $data['indicador_2'][$i];
             //$sma80 = $data['sma80'][$i];
             //$wma30  = $data['wma30'];
             $candles = $data['candles'];
@@ -171,13 +191,11 @@ class StockController extends Controller
 //                return "Lo siento! No puedo analizar eso " . hex2bin('F09F989E');
 //            }
 
-
-
             //ALERT W30
             //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //ALERT STOCK
-            return AnalysisService::alert($stock->name, $price, $ema100, $sma200, $stock->last_signal);
+            return AnalysisService::alert($stock->name, $price, $indicador_1, $indicador_2, $stock->last_signal);
 
             //COMPRA
 /*           $condition_buy_2 = ($vol > $avg );

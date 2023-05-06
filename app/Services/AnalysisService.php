@@ -13,7 +13,7 @@ class AnalysisService
      * @return array
      * @throws ApiException
      */
-    public static function getData($stock): array
+    public static function getData($stock, $short_term): array
     {
         $to = Carbon::now()->timestamp;
         $from = Carbon::now()->subYear()->timestamp;
@@ -25,11 +25,17 @@ class AnalysisService
         //      $technicalEvents = $response->finance->result->instrumentInfo->technicalEvents;
         // }
 
+        if($short_term) {
+            $indicator_1 = FinnhubService::technicalIndicator($stock, $from, $to, 9);
+            $indicator_2 = FinnhubService::technicalIndicator($stock, $from, $to, 18);
+        } else {
+            $indicator_1 = FinnhubService::technicalIndicator($stock, $from, $to, 100, 'ema');
+            $indicator_2 = FinnhubService::technicalIndicator($stock, $from, $to, 200);
+        }
         return [
             'wma30' =>  FinnhubService::technicalIndicator($stock, $from, $to, 30, "wma"),
-            'ema100' => FinnhubService::technicalIndicator($stock, $from, $to, 100, 'ema'),
-            'sma200' => FinnhubService::technicalIndicator($stock, $from, $to, 200),
-            //'sma80' => FinnhubService::technicalIndicator($stock, $from, $to, 80),
+            'indicador_1' => $indicator_1,
+            'indicador_2' => $indicator_2,
             'candles' => $candles,
             'count' => count($candles['v'] ) - 1
         ];
