@@ -123,26 +123,6 @@ class StockController extends Controller
 
     }
 
-//    private function alertW30($stock, $price_today, $price_yesterday, $w30_today, $w30_yesterday) {
-//
-//        if($w30_yesterday <= $price_yesterday && $w30_today > $price_today) {
-//            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN ALZA: ** - PRECIO: ' . $price_today . '** ' ;
-//        }
-//
-//        if($w30_yesterday >= $price_yesterday && $w30_today < $price_today) {
-//            $text = 'ALERTA: **' . $stock .'** - CRUZO W30 EN BAJA: ** - PRECIO: ' . $price_today . '** ' ;
-//        }
-//
-//        if(isset($text)) {
-//            $telegram = TelegramService::new();
-//            $telegram->sendMessage([
-//                'chat_id' => '@ageofinvestments',
-//                'text' => $text,
-//                'parse_mode' => 'MARKDOWN'
-//            ]);
-//        }
-//
-//    }
 
     private function alert($stock, $price, $sma9, $sma18, $last_signal) {
 
@@ -191,7 +171,7 @@ class StockController extends Controller
             $indicador_1 = $data['indicador_1'][$i];
             $indicador_2 = $data['indicador_2'][$i];
             //$sma80 = $data['sma80'][$i];
-            //$wma30  = $data['wma30'];
+            $wma30  = $data['wma30'];
             $candles = $data['candles'];
 
 //            if(/*!isset($technicalEvents) ||*/ !isset($candles['v'][$i]) || !isset($ema100[$i]) || !isset($sma200[$i]) || !isset($sma80[$i])) {
@@ -199,11 +179,11 @@ class StockController extends Controller
 //            }
 
             //ALERT W30
-            //$text = AnalysisService::alertW30($stock->name, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
+            //$text_alert_w30 = AnalysisService::alertW30($name_stock, $candles['c'][$i], $candles['c'][$i-1], $wma30[$i], $wma30[$i-1]);
 
             //ALERT STOCK
             return AnalysisService::alert($name_stock, $price, $indicador_1, $indicador_2, $last_signal);
-
+            
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
