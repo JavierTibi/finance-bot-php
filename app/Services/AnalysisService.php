@@ -78,13 +78,13 @@ class AnalysisService
             if($price < $signal_1 && $signal_1 < $signal_2 && $last_signal == 'buy') {
                 return 'ALERTA: **' . $stock .'** - CRUZO EN BAJA: ** - PRECIO: ' . $price . '** ' ;
             }
-        }
-
-        if($price > $signal_1 && $signal_1 > $signal_2) {
-            return '**' . $stock .'** - ESTA EN ALZA: ** - PRECIO: ' . $price . '** ' ;
-        }
-        if($price < $signal_1 && $signal_1 < $signal_2) {
-            return '**' . $stock .'** - ESTA EN BAJA: ** - PRECIO: ' . $price . '** ' ;
+        } else {
+            if($price > $signal_1 && $signal_1 > $signal_2) {
+                return '**' . $stock .'** - ESTA EN ALZA: ** - PRECIO: ' . $price . '** ' ;
+            }
+            if($price < $signal_1 && $signal_1 < $signal_2) {
+                return '**' . $stock .'** - ESTA EN BAJA: ** - PRECIO: ' . $price . '** ' ;
+            }
         }
     }
 
