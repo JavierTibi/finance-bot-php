@@ -86,7 +86,6 @@ class AnalysisService
         if($price < $signal_1 && $signal_1 < $signal_2) {
             return '**' . $stock .'** - ESTA EN BAJA: ** - PRECIO: ' . $price . '** ' ;
         }
-        return "No se puede determinar";
     }
 
 }
