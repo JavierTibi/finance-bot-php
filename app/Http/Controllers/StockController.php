@@ -89,7 +89,7 @@ class StockController extends Controller
                 $stock = Stock::where('name', $request->stock)->first();
             }
 
-            if(in_array($stock, ['TQQQ', 'UPRO'])) {
+            if(in_array($stock, ['TQQQ', 'UPRO', 'TECL', 'USD', 'ROM'])) {
                 $text = $this->analisys($stock, true);
             } else {
                 $text = $this->analisys($stock);
@@ -183,7 +183,7 @@ class StockController extends Controller
 
             //ALERT STOCK
             return AnalysisService::alert($name_stock, $price, $indicador_1, $indicador_2, $last_signal);
-            
+
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
